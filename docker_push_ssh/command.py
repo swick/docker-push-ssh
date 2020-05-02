@@ -32,13 +32,14 @@ class Command(object):
         self.arguments = arguments
 
         self.environment_variables = dict()
+        self.process = None
 
     def environment(self, key, value):
         self.environment_variables[key] = value
         return self
 
     def environment_dict(self, env_dict):
-        for key, value in env_dict.iteritems():
+        for key, value in env_dict.items():
             self.environment_variables[key] = value
         return self
 
@@ -51,6 +52,7 @@ class Command(object):
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             env=self.environment_variables)
+        self.process = s_process
 
         if waitForExit:
             out, err = s_process.communicate()
@@ -62,6 +64,9 @@ class Command(object):
         # print err
 
         return ProcessResult(self, out, err, exitcode, s_process.pid)
+
+    def terminate(self):
+        self.process.terminate()
 
 
 class ProcessResult(object):
